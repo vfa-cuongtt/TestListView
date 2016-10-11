@@ -14,6 +14,7 @@ import {
 var Sound = require('react-native-sound');
 var RNFS = require('react-native-fs');
 
+
 var mp3 = new Sound('mp3files/Guong Mat la Lam.mp3',Sound.MAIN_BUNDLE,(error)=>{
   if(error){
     console.log('Ko load dc nhac', error);
@@ -21,20 +22,35 @@ var mp3 = new Sound('mp3files/Guong Mat la Lam.mp3',Sound.MAIN_BUNDLE,(error)=>{
     console.log('Load dc nhac roi');
   }
 });
-
-var DATA = [];
+var DATA = new Array() ;
 var array = [
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'},
-  {ten:'Nguyen Van A'}
+   { name: 'Anh Cu Di Di.mp3',
+      path: '/Users/cuongtt/Library/Developer/CoreSimulator/Devices/4483BD97-9EA3-4180-B6CB-87F9BC210328/data/Containers/Bundle/Application/935B6F90-DE05-4803-890C-FC13C5932D3D/Test.app/mp3files/Anh Cu Di Di.mp3',
+      size: 4013391,
+      isFile: [Function: isFile],
+      isDirectory: [Function: isDirectory] },
+    { name: 'Guong Mat la Lam.mp3',
+      path: '/Users/cuongtt/Library/Developer/CoreSimulator/Devices/4483BD97-9EA3-4180-B6CB-87F9BC210328/data/Containers/Bundle/Application/935B6F90-DE05-4803-890C-FC13C5932D3D/Test.app/mp3files/Guong Mat la Lam.mp3',
+      size: 5349075,
+      isFile: [Function: isFile],
+      isDirectory: [Function: isDirectory] },
+    { name: 'Hay Ra Khoi Nguoi Do Di.mp3',
+      path: '/Users/cuongtt/Library/Developer/CoreSimulator/Devices/4483BD97-9EA3-4180-B6CB-87F9BC210328/data/Containers/Bundle/Application/935B6F90-DE05-4803-890C-FC13C5932D3D/Test.app/mp3files/Hay Ra Khoi Nguoi Do Di.mp3',
+      size: 3045871,
+      isFile: [Function: isFile],
+      isDirectory: [Function: isDirectory] },
+    { name: 'Nhu Phut Ban Dau.mp3',
+      path: '/Users/cuongtt/Library/Developer/CoreSimulator/Devices/4483BD97-9EA3-4180-B6CB-87F9BC210328/data/Containers/Bundle/Application/935B6F90-DE05-4803-890C-FC13C5932D3D/Test.app/mp3files/Nhu Phut Ban Dau.mp3',
+      size: 4056745,
+      isFile: [Function: isFile],
+      isDirectory: [Function: isDirectory] },
+    { name: 'Xin Em.mp3',
+      path: '/Users/cuongtt/Library/Developer/CoreSimulator/Devices/4483BD97-9EA3-4180-B6CB-87F9BC210328/data/Containers/Bundle/Application/935B6F90-DE05-4803-890C-FC13C5932D3D/Test.app/mp3files/Xin Em.mp3',
+      size: 5187743,
+      isFile: [Function: isFile],
+      isDirectory: [Function: isDirectory] }
 ];
+var test = "test";
 
 class Test extends Component {
   playSound(){
@@ -45,8 +61,7 @@ class Test extends Component {
     mp3.pause();
   }
 
-  createRows(property){
-    console.log('createRows' ,property.name);
+  renderRows(property){
     return(
       <View style={styles.rows}>
         <Text>{property.name}</Text>
@@ -54,30 +69,49 @@ class Test extends Component {
     );
   }
 
-  constructor(props){
-    super(props);
-
+  checkDATA(callback){
     RNFS.readDir(RNFS.MainBundlePath + '/mp3files')
     .then((result) => {
       // Load file and push into array DATA
 
       for (var i = 0; i < result.length; i++) {
-
         DATA.push(result[i]);
       }
-      console.log('DATA', DATA);
-  //    return Promise.all([RNFS.stat(result[0].name), result[0].name]);
-  
-      return DATA;
+      console.log();
+      //callback(this,DATA);
+      callback(DATA);
+      //return DATA;
     })
     .catch((err) => {
       console.log(err.message, err.code);
+      return false;
     });
+  }
 
-    var dataSource = new ListView.DataSource({rowHasChanged:(r1,r2)=>r1!=r2});
+
+  constructor(props){
+    super(props);
+    this.state = { dataSource : new ListView.DataSource({ rowHasChanged:(r1,r2) => r1 != r2 })};
+    /*var ds = new ListView.DataSource({ rowHasChanged:(r1,r2) => r1 != r2 });
     this.state = {
-      dataList : dataSource.cloneWithRows(DATA)
-    };
+      dataList: ds.cloneWithRows(array)
+    };*/
+
+    this.checkDATA(function(m_DATA){
+
+        console.log('DATA1',m_DATA);
+
+        this.setState({
+          dataList:this.state.dataSource.cloneWithRows(m_DATA)
+        });
+
+     });
+
+
+    /*var ds = new ListView.DataSource({ rowHasChanged:(r1,r2) => r1 != r2 });
+    this.state={
+      dataList : ds.cloneWithRows(this.checkDATA())
+    };*/
 
   }
 
@@ -87,7 +121,7 @@ class Test extends Component {
         <View style={styles.listView}>
           <ListView
             dataSource={this.state.dataList}
-            renderRow={this.createRows}
+            renderRow={this.renderRows}
           />
         </View>
 
